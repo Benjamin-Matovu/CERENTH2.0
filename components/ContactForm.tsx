@@ -24,13 +24,15 @@ export default function ContactForm() {
         status: 'pending'
       };
 
-      console.log('Submitting to Next.js API route with data:', bookingPayload);
+      console.log('Submitting to Supabase Edge Function with data:', bookingPayload);
       
-      // Call Next.js API route
-      const response = await fetch('/api/send-email', {
+      // Call Supabase Edge Function directly (works on Cloudflare Pages)
+      const supabaseUrl = 'https://ywlqqmcupsqrbcaecueu.supabase.co';
+      const response = await fetch(`${supabaseUrl}/functions/v1/send-booking-email`, {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
+          'Authorization': `Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl3bHFxbWN1cHNxcmJjYWVjdWV1Iiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODI2NzcyNzcsImV4cCI6MjA5ODI1MzI3N30.62E7_j3Z1gnzveIAGugxC2QcbZVCoUntss9VMSiPlKc`,
         },
         body: JSON.stringify({
           record: bookingPayload
@@ -39,11 +41,11 @@ export default function ContactForm() {
 
       if (!response.ok) {
         const errorText = await response.text();
-        console.error('API route error:', errorText);
+        console.error('Edge function error:', errorText);
         setStatus("error");
       } else {
         const result = await response.json();
-        console.log('API route response:', result);
+        console.log('Edge function response:', result);
         setStatus("success");
       }
     } catch (error) {
