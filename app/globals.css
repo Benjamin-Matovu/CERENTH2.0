@@ -1,0 +1,92 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --ivory: #F7F4ED;
+    --white: #FFFFFF;
+    --border-light: #E8E5D8;
+    --dusty-rose: #D8B4C0;
+    --charcoal: #242424;
+    --gold: #C7A86B;
+    --danger: #FF4C4C;
+  }
+
+  * {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--ivory);
+    color: var(--charcoal);
+    font-family: var(--font-montserrat), sans-serif;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+    -webkit-text-size-adjust: 100%;
+    -moz-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+
+  /* Cross-platform input normalization */
+  input, textarea, select {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  /* iOS date/time input fix */
+  input[type="date"],
+  input[type="time"],
+  input[type="datetime-local"] {
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+  }
+
+  /* Focus states for accessibility */
+  *:focus-visible {
+    outline: 2px solid var(--gold);
+    outline-offset: 2px;
+  }
+
+  /* Selection */
+  ::selection {
+    background-color: #D8B4C060;
+    color: var(--charcoal);
+  }
+}
+
+@layer components {
+  /* Section padding - 8px grid system */
+  .section-padding {
+    @apply py-section-y-mobile px-6 md:py-section-y md:px-8;
+  }
+
+  /* Container */
+  .container-main {
+    @apply mx-auto max-w-[1200px] px-6 md:px-8;
+  }
+
+  /* Eyebrow label */
+  .eyebrow {
+    @apply text-caption uppercase tracking-[0.08em] text-gold font-bold;
+  }
+
+  /* Card base */
+  .card {
+    @apply rounded-card border border-border-light bg-white p-8 transition-all duration-200;
+  }
+
+  .card:hover {
+    @apply scale-[1.02] shadow-card-hover;
+  }
+}
