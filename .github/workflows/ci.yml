@@ -1,0 +1,73 @@
+name: production-validate
+on:
+  pull_request:
+    branches: [main]
+    types: [opened, synchronize, reopened]
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+      
+      - name: Install dependencies
+        run: npm install
+      
+      - name: TypeScript check
+        run: npx tsc --noEmit
+      
+      - name: Lint (strict)
+        run: npm run lint -- --max-warnings 0
+      
+      - name: Scan for secrets (strict)
+        uses: trufflesecurity/trufflehog@main
+        with:
+          path: ./
+          extra_args: --json
+      
+      - name: Audit dependencies (critical only)
+        run: npm audit --audit-level=critical
+      
+      - name: SAST with Semgrep
+        uses: returntocorp/semgrep-action@v1
+        with:
+          config: >-
+            p/security-audit
+            p/owasp-top-ten
+            p/cwe-top-25
+      
+      - name: Build
+        run: npm run build
+      
+      - name: Test static export integrity
+        run: |
+          set -e
+          echo "Checking for required pages..."
+          check_page() {
+            local label="$1"
+            shift
+            for path in "$@"; do
+              if [ -f "$path" ]; then
+                return 0
+              fi
+            done
+            echo "Missing ${label} page (checked: $*)"
+            exit 1
+          }
+          check_page "home" out/index.html
+          check_page "services" out/services/index.html
+          check_page "about" out/about/index.html
+          check_page "contact" out/contact/index.html
+      
+      - name: Upload validation artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: production-validation-${{ github.run_number }}
+          path: out/
+          retention-days: 7
